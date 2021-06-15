@@ -29,7 +29,7 @@ class ForestTree:
 TREE_COLUMN_NAMES_TO_SUMMARY_STATISTICS = {
     (ForestTree.jasmine, 'missing_time'): ('gps_data_missing_duration', None),
     (ForestTree.jasmine, 'home_time'): ('home_duration', None),
-    (ForestTree.jasmine, 'max_dist_home'): ('distance_from_home', None),
+    (ForestTree.jasmine, 'max_dist_home'): ('distance_from_home_maximum', None),
     (ForestTree.jasmine, 'dist_traveled'): ('distance_traveled', None),
     (ForestTree.jasmine, 'av_flight_length'): ('flight_distance_average', None),
     (ForestTree.jasmine, 'sd_flight_length'): ('flight_distance_standard_deviation', None),

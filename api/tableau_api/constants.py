@@ -8,7 +8,7 @@ SERIALIZABLE_FIELD_NAMES = [
     
     # GPS
     "distance_diameter",
-    "distance_from_home",
+    "distance_from_home_maximum",
     "distance_traveled",
     "flight_distance_average",
     "flight_distance_standard_deviation",

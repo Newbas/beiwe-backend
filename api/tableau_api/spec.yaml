@@ -62,7 +62,7 @@ components:
         type: string
     filter_fields:
       description: Comma-separated list of fields to include in results (by default, all fields are included)
-      example: '?fields=distance_diameter,distance_from_home'
+      example: '?fields=distance_diameter,distance_from_home_maximum'
       explode: false
       in: query
       name: fields
@@ -169,7 +169,7 @@ components:
               description: Largest distance between any two places visited (meters)
               format: float
               type: number
-            distance_from_home:
+            distance_from_home_maximum:
               # MaxHomeDist_km
               description: Maximum distance from home (meters)
               format: float

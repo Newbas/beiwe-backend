@@ -279,7 +279,7 @@ class SummaryStatisticDaily(TimestampedModel):
     
     # GPS
     distance_diameter = models.FloatField(null=True, blank=True)
-    distance_from_home = models.FloatField(null=True, blank=True)
+    distance_from_home_maximum = models.FloatField(null=True, blank=True)
     distance_traveled = models.FloatField(null=True, blank=True)
     flight_distance_average = models.FloatField(null=True, blank=True)
     flight_distance_standard_deviation = models.FloatField(null=True, blank=True)
