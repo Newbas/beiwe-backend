@@ -1,11 +1,13 @@
 from django.db.models import ProtectedError
 from flask import Blueprint, flash, redirect, render_template, request
 
+from api.study_api_helpers import get_values_for_view_study_table
 from authentication.admin_authentication import (authenticate_researcher_study_access,
     get_researcher_allowed_studies, researcher_is_an_admin)
 from database.schedule_models import Intervention, InterventionDate
 from database.study_models import Study, StudyField
 from database.user_models import Participant, ParticipantFieldValue
+
 
 study_api = Blueprint('study_api', __name__)
 
@@ -34,8 +36,9 @@ def get_participants_api(study_id):
     filtered_participants_count = (Participant
                                    .filtered_participants_for_study(study_id, contains_string)
                                    .count())
-    data = Participant.get_values_for_view_study_table(study_id, start, length, sort_by_column_index,
-                                                       sort_in_descending_order, contains_string)
+    data = get_values_for_view_study_table(
+        study_id, start, length, sort_by_column_index, sort_in_descending_order, contains_string
+    )
     table_data = {
         "draw": draw,
         "recordsTotal": total_participants_count,
