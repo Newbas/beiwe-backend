@@ -3,13 +3,10 @@ import os
 import traceback
 from datetime import datetime, timedelta
 
-from cronutils.error_handler import NullErrorHandler
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import transaction
 from django.db.models import Sum
 from django.utils import timezone
-from forest.jasmine.traj2stats import gps_stats_main
-from forest.willow.log_stats import log_stats_main
 from pkg_resources import get_distribution
 
 from api.data_access_api import chunk_fields
@@ -18,11 +15,13 @@ from database.data_access_models import ChunkRegistry
 from database.tableau_api_models import ForestTask
 from libs.celery_control import forest_celery_app, safe_apply_async
 from libs.forest_integration.constants import ForestTree
-
-
 # run via cron every five minutes
 from libs.s3 import s3_retrieve
+from libs.sentry import make_error_sentry, SentryTypes
 from libs.streaming_zip import determine_file_name
+
+from forest.jasmine.traj2stats import gps_stats_main
+from forest.willow.log_stats import log_stats_main
 
 
 TREE_TO_FOREST_FUNCTION = {
@@ -34,8 +33,7 @@ TREE_TO_FOREST_FUNCTION = {
 def create_forest_celery_tasks():
     pending_tasks = ForestTask.objects.filter(status=ForestTask.Status.queued)
 
-    # with make_error_sentry(sentry_type=SentryTypes.data_processing):  # add a new type?
-    with NullErrorHandler():  # for debugging, does not suppress errors
+    with make_error_sentry(sentry_type=SentryTypes.data_processing):  # add a new type?
         for task in pending_tasks:
             print(f"Queueing up celery task for {task.participant} on tree {task.forest_tree} from {task.data_date_start} to {task.data_date_end}")
             enqueue_forest_task(args=[task.id])
