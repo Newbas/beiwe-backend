@@ -15,7 +15,6 @@ from database.data_access_models import ChunkRegistry
 from database.tableau_api_models import ForestTask
 from libs.celery_control import forest_celery_app, safe_apply_async
 from libs.forest_integration.constants import ForestTree
-# run via cron every five minutes
 from libs.s3 import s3_retrieve
 from libs.sentry import make_error_sentry, SentryTypes
 from libs.streaming_zip import determine_file_name
@@ -42,6 +41,11 @@ def create_forest_celery_tasks():
 #run via celery as long as tasks exist
 @forest_celery_app.task(queue=FOREST_QUEUE)
 def celery_run_forest(forest_task_id):
+    with make_error_sentry(SentryTypes.data_processing):
+        _celery_run_forest(forest_task_id)
+
+
+def _celery_run_forest(forest_task_id):
     with transaction.atomic():
         task = ForestTask.objects.filter(id=forest_task_id).first()
 
@@ -112,13 +116,14 @@ def celery_run_forest(forest_task_id):
     except Exception:
         task.status = task.Status.error
         task.stacktrace = traceback.format_exc()
+        raise  # report the error to sentry
     else:
         task.status = task.Status.success
-    task.save(update_fields=["status", "stacktrace"])
-    task.clean_up_files()
-    task.process_end_time = timezone.now()
-    task.save(update_fields=["process_end_time"])
-    
+    finally:
+        task.save(update_fields=["status", "stacktrace"])
+        task.clean_up_files()
+        task.process_end_time = timezone.now()
+        task.save(update_fields=["process_end_time"])
 
 
 def create_local_data_files(task, chunks):
